@@ -44,7 +44,33 @@
             <h2>Add New Contact</h2>
         </div>
         <div class="row">
-            <form class="col s12 formValidate" action="" id="add-contact-form">
+            <div class="materialert">
+                <i class="material-icons">check_circle</i> <span>Bienvenido, Linebeck</span>
+                <button type="button" class="close-alert">×</button>
+            </div>
+            <div class="materialert info">
+                <div class="material-icons">info_outline</div>
+                Oh! What a beautiful alert :)
+                <button type="button" class="close-alert">×</button>
+            </div>
+            <div class="materialert error">
+                <div class="material-icons">error_outline</div>
+                Oh! What a beautiful alert :)
+                <button type="button" class="close-alert">×</button>
+            </div>
+            <div class="materialert success">
+                <div class="material-icons">check</div>
+                Oh! What a beautiful alert :)
+                <button type="button" class="close-alert">×</button>
+            </div>
+            <div class="materialert warning">
+                <div class="material-icons">warning</div>
+                Oh! What a beautiful alert :)
+                <button type="button" class="close-alert">×</button>
+            </div>
+        </div>
+        <div class="row">
+            <form class="col s12 formValidate" action="" id="add-contact-form" method="POST" enctype="multipart/form-data">
                 <div class="row mb10">
                     <div class="input-field col s6">
                         <input id="first_name" name="first_name" type="text" class="validate" data-error=".first_name_error">
