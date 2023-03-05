@@ -1,7 +1,7 @@
 <?php
 function db_connect()
 {
-    static $connection; // har connection establish krta or naya connection lata agr static nhi deta tu
+    static $connection; // har baar connection establish krta or naya connection lata agr static nhi deta tu
     if(!isset($connection)) {
         $config = parse_ini_file("./config.ini");
 
@@ -67,6 +67,21 @@ function prepare_insert_query($table_name,$data) {
     return $query;
 }
 
+function prepare_update_query($table_name,$data,$id) {
+    $first_name = $data['first_name'];
+    $last_name = $data['last_name'];
+    $birthdate = $data['birthdate'];
+    $telephone = $data['telephone'];
+    $email = $data['email'];
+    $address = $data['address'];
+    $image = $data["image_name"];
+
+    $query = "UPDATE contacts SET first_name='{$first_name}', last_name='{$last_name}', birthdate='{$birthdate}', telephone='{$telephone}', email='{$email}',  address='{$address}',image_name='{$image}' WHERE id=$id";
+    // $query = "UPDATE contacts SET first_name='{$first_name}', last_name='{$last_name}', birthdate='{$birthdate}', telephone='{$telephone}', email='{$email}',  address='{$address}' WHERE id=$id";
+    // dd($query);
+    return $query;
+}
 function get_image_name($image_name,$id) {
     return strpos($image_name,".") ? $image_name : "$id.$image_name";
 }
+

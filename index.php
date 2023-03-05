@@ -9,18 +9,21 @@ if($rows === false) {
 }
 
 $total_num_of_contacts = $rows[0]['total_count'];
+// dd($total_num_of_contacts);
 $num_of_pages = ceil($total_num_of_contacts / ROWS_PER_PAGE);
 
 $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+// dd($_GET['page']);
 
 if($current_page < 1 || $current_page > $num_of_pages) {
     die("404 NOT FOUND");
 }
 
 $offset = ($current_page-1)*ROWS_PER_PAGE;
-$rows_per_page = ROWS_PER_PAGE;
+$rows_per_page = ROWS_PER_PAGE;  
 
 $rows = db_select("SELECT * FROM contacts LIMIT $offset,$rows_per_page");
+// dd($rows);
 
 if($rows === false) {
     dd(db_error());
@@ -36,7 +39,7 @@ if($rows === false) {
     <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection" />
 
-    <!--Import Csutom CSS-->
+    <!--Import Custom CSS-->
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -70,9 +73,9 @@ if($rows === false) {
     <!-- Add a New Contact Link-->
     <div class="row mt50">
         <div class="col s12 right-align">
-            <a class="btn waves-effect waves-light blue lighten-2" href="add-contact.php"><i
-                    class="material-icons left">add</i> Add
-                New</a>
+            <a class="btn waves-effect waves-light blue lighten-2" href="add-contact.php">
+                <i class="material-icons left">add</i>AddNew
+            </a>
         </div>
     </div>
     <!-- /Add a New Contact Link-->
@@ -105,7 +108,7 @@ if($rows === false) {
                         <td><?= $row['birthdate']; ?></td>
                         <td><?= $row['telephone']; ?></td>
                         <td><?= $row['address']; ?></td>
-                        <td><a class="btn btn-floating green lighten-2"><i class="material-icons">edit</i></a></td>
+                        <td><a href="edit-contact.php?id=<?= $row['id'];?>" class="btn btn-floating green lighten-2"><i class="material-icons">edit</i></a></td>
                         <td><a class="btn btn-floating red lighten-2 modal-trigger" href="#deleteModal"><i class="material-icons">delete_forever</i></a>
                         </td>
                     </tr>
@@ -124,7 +127,7 @@ if($rows === false) {
             <?php
                 $left = $current_page == 1 ? "disabled " : "enabled waves-effect";
             ?>
-                <li class="<?=$right ?>"><a href="?page=<?=$current_page - 1 ?>"><i class="material-icons">chevron_left</i></a></li>
+                <li class="<?=$left ?>"><a href="?page=<?=($current_page == 1) ? 1 : $current_page - 1 ?>"><i class="material-icons">chevron_left</i></a></li>
                 <?php
                 for($i=1;$i<=$num_of_pages;$i++):
                     $styles = $i == $current_page ? "active waves-effect" : "waves-effect";
@@ -141,7 +144,7 @@ if($rows === false) {
                 $right = $current_page == $num_of_pages ? "disabled " : "enabled waves-effect";
                 ?>
                 <li class=<?=$right ?>>
-                    <a href="?page=<?= $current_page+1 ?>">
+                    <a href="?page=<?= ($current_page == $num_of_pages) ? $num_of_pages : $current_page + 1  ?>">
                         <i class="material-icons">chevron_right</i>
                     </a>
                 </li>

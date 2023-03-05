@@ -2,8 +2,40 @@
 <html>
 <?php
 require_once('./includes/functions.inc.php');
+
+if(isset($_GET['id']))
+{
+    $id = $_GET['id'];
+    $query = "SELECT * FROM contacts WHERE id = $id";
+    $rows = db_select($query);
+    if(count($rows) === 0)
+    {
+        dd("404 ERROR PAGE");
+    }
+    // dd($rows);
+    // $rows = db_select($query);
+}
+
+
+// $id = $_GET['id'];
+// $rows = db_select("SELECT * FROM contacts WHERE id = $id");
+// dd($rows);
+
 $error = false;
 if(isset($_POST['action'])) {
+    // dd($_POST['id']);
+    $id = sanitize($_POST['id']);
+
+    $query = "SELECT * FROM contacts WHERE id = $id";
+    $rows = db_select($query);
+    if(count($rows) === 0)
+    {
+        dd("404 ERROR PAGE");
+    }
+    $rows = db_select($query);
+    // dd($rows);
+
+
     $first_name = sanitize($_POST['first_name']);
     $last_name = sanitize($_POST['last_name']);
     $email = sanitize($_POST['email']);
@@ -21,7 +53,10 @@ if(isset($_POST['action'])) {
         $tmp_file_path = $_FILES['pic']['tmp_name']; // D:\Programe Files\Xampp\tmp\php696A.tmp
         $file_name_as_array = explode(".",$tmp_file_nmae); // convert string to array ie file_name_as_array[0] = antonio-freeman and file_name_as_array[0] = jpg
         // dd($file_name_as_array);
+        $img_name = $file_name_as_array[0];
         $ext = end($file_name_as_array);
+        $image_full_path = $img_name.".".$ext;
+
 
         $data['first_name'] = $first_name;
         $data['last_name'] = $last_name;
@@ -29,13 +64,13 @@ if(isset($_POST['action'])) {
         $data['telephone'] = $telephone;
         $data['email'] = $email;
         $data['address'] = $address;
-        $data['image_name'] = $ext;
-
-        $query = prepare_insert_query("contacts",$data);
+        $data['image_name'] = $image_full_path;
+        $query = prepare_update_query("contacts",$data,$id);
+        // dd($query);
         db_query($query);
-        $id = get_last_insert_id();
-        $file_name = "$id.$ext";
-        move_uploaded_file($tmp_file_path,"images/users/$file_name");
+        // $id = get_last_insert_id();
+        // $file_name = "$id.$ext";
+        move_uploaded_file($tmp_file_path,"images/users/$image_full_path");
     }
 } 
 ?>
@@ -50,7 +85,7 @@ if(isset($_POST['action'])) {
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Add Contact</title>
+    <title>Edit Contact</title>
 </head>
 
 <body>
@@ -79,7 +114,7 @@ if(isset($_POST['action'])) {
     <!--/NAVIGATION BAR-->
     <div class="container">
         <div class="row mt50">
-            <h2>Add New Contact</h2>
+            <h2>Edit Contact</h2>
         </div>
         <?php
         if($error):
@@ -115,40 +150,41 @@ if(isset($_POST['action'])) {
         ?>
         <div class="row">
             <form class="col s12 formValidate" action="<?=$_SERVER['PHP_SELF']; ?>" id="add-contact-form" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="contact_id" value="<?= $rows[0]['id'];?>">
                 <div class="row mb10">
                     <div class="input-field col s6">
-                        <input id="first_name" name="first_name" type="text" class="validate" data-error=".first_name_error" value="<?=old($_POST,'first_name')?>">
+                        <input id="first_name" name="first_name" type="text" class="validate" data-error=".first_name_error" value="<?=$rows[0]['first_name'];?>">
                         <label for="first_name">First Name</label>
                         <div class="first_name_error "></div>
                     </div>
                     <div class="input-field col s6">
-                        <input id="last_name" name="last_name" type="text" class="validate" data-error=".last_name_error" value="<?=old($_POST,'last_name')?>">
+                        <input id="last_name" name="last_name" type="text" class="validate" data-error=".last_name_error" value="<?=$rows[0]['last_name'];?>">
                         <label for="last_name">Last Name</label>
                         <div class="last_name_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s6">
-                        <input id="email" name="email" type="email" class="validate" data-error=".email_error" value="<?=old($_POST,'email')?>">
+                        <input id="email" name="email" type="email" class="validate" data-error=".email_error" value="<?=$rows[0]['email'];?>">
                         <label for="email">Email</label>
                         <div class="email_error "></div>
                     </div>
                     <div class="input-field col s6">
-                        <input id="birthdate" name="birthdate" type="text" class="datepicker" data-error=".birthday_error" value="<?=old($_POST,'birthdate')?>">
+                        <input id="birthdate" name="birthdate" type="text" class="datepicker" data-error=".birthday_error" value="<?=$rows[0]['birthdate'];?>">
                         <label for="birthdate">Birthdate</label>
                         <div class="birthday_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s12">
-                        <input id="telephone" name="telephone" type="tel" class="validate" data-error=".telephone_error" value="<?=old($_POST,'telephone')?>">
+                        <input id="telephone" name="telephone" type="tel" class="validate" data-error=".telephone_error" value="<?=$rows[0]['telephone'];?>">
                         <label for="telephone">Telephone</label>
                         <div class="telephone_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s12">
-                        <textarea id="address" name="address" class="materialize-textarea" data-error=".address_error" value="<?=old($_POST,'address')?>"></textarea>
+                        <textarea id="address" name="address" class="materialize-textarea" data-error=".address_error"><?=$rows[0]['address'];?></textarea>
                         <label for="address">Addess</label>
                         <div class="address_error "></div>
                     </div>
@@ -165,7 +201,7 @@ if(isset($_POST['action'])) {
                         <div class="pic_error "></div>
                     </div>
                 </div>
-                <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+                <button class="btn waves-effect waves-light right" type="submit" name="action">Update
                         <i class="material-icons right">send</i>
                     </button>
             </form>
