@@ -16,7 +16,8 @@ $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
 // dd($_GET['page']);
 
 if($current_page < 1 || $current_page > $num_of_pages) {
-    die("404 NOT FOUND");
+    // die("404 NOT FOUND");
+    header('Location: 404.html');
 }
 
 $offset = ($current_page-1)*ROWS_PER_PAGE;
@@ -109,7 +110,7 @@ if($rows === false) {
                         <td><?= $row['telephone']; ?></td>
                         <td><?= $row['address']; ?></td>
                         <td><a href="edit-contact.php?id=<?= $row['id'];?>" class="btn btn-floating green lighten-2"><i class="material-icons">edit</i></a></td>
-                        <td><a class="btn btn-floating red lighten-2 modal-trigger" href="#deleteModal"><i class="material-icons">delete_forever</i></a>
+                        <td><a class="btn btn-floating red lighten-2 modal-trigger delete-contact" data-id="<?= $row['id']; ?>" href="#deleteModal"><i class="material-icons">delete_forever</i></a>
                         </td>
                     </tr>
                     <?php
@@ -169,7 +170,7 @@ if($rows === false) {
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close btn blue-grey lighten-2 waves-effect">Cancel</a>
-            <a href="#!" class="modal-close btn waves-effect red lighten-2">Agree</a>
+            <a href="#!" class="modal-close btn waves-effect red lighten-2" id="modal-agree">Agree</a>
         </div>
     </div>
     <!-- /Delete Modal Structure -->

@@ -3,59 +3,36 @@
 <?php
 require_once('./includes/functions.inc.php');
 
-if(isset($_GET['id']))
-{
-    $id = $_GET['id'];
-    $query = "SELECT * FROM contacts WHERE id = $id";
-    $rows = db_select($query);
-    if(count($rows) === 0)
-    {
-        dd("404 ERROR PAGE");
-    }
-    // dd($rows);
-    // $rows = db_select($query);
-}
-
-
-// $id = $_GET['id'];
-// $rows = db_select("SELECT * FROM contacts WHERE id = $id");
-// dd($rows);
-
 $error = false;
 if(isset($_POST['action'])) {
-    // dd($_POST['id']);
-    $id = sanitize($_POST['id']);
-
-    $query = "SELECT * FROM contacts WHERE id = $id";
-    $rows = db_select($query);
-    if(count($rows) === 0)
-    {
-        dd("404 ERROR PAGE");
-    }
-    $rows = db_select($query);
-    // dd($rows);
-
-
     $first_name = sanitize($_POST['first_name']);
     $last_name = sanitize($_POST['last_name']);
     $email = sanitize($_POST['email']);
     $birthdate = date('Y-m-d',strtotime(sanitize($_POST['birthdate'])));
     $telephone = sanitize($_POST['telephone']);
     $address = sanitize($_POST['address']);
+    $id = $_POST['contact_id'];
     
+    $query = "SELECT image_name FROM contacts WHERE id = $id";
+    // dd($query);
+    $rows = db_select($query)[0];
+    $old_image_name = $rows['image_name'];
+    // dd($old_image_name);
+
     if(!$first_name || !$last_name || !$email || !$birthdate || !$telephone || !$address || !isset($_FILES['pic']['name'])) {
         $error = true;
     } else {
         // we have validate values, which we can directly insert in database
 
         // $_FILES = array(1) { ["pic"]=> array(5) { ["name"]=> string(19) "antonio-freeman.jpg" ["type"]=> string(10) "image/jpeg" ["tmp_name"]=> string(39) "D:\Programe Files\Xampp\tmp\phpB4C1.tmp" ["error"]=> int(0) ["size"]=> int(5004) } }
-        $tmp_file_nmae = $_FILES['pic']['name']; // antonio-freeman.jpg
-        $tmp_file_path = $_FILES['pic']['tmp_name']; // D:\Programe Files\Xampp\tmp\php696A.tmp
-        $file_name_as_array = explode(".",$tmp_file_nmae); // convert string to array ie file_name_as_array[0] = antonio-freeman and file_name_as_array[0] = jpg
-        // dd($file_name_as_array);
-        $img_name = $file_name_as_array[0];
-        $ext = end($file_name_as_array);
-        $image_full_path = $img_name.".".$ext;
+        if(!empty($_FILES['pic']['name'])) {
+            $tmp_file_nmae = $_FILES['pic']['name']; // antonio-freeman.jpg
+            $tmp_file_path = $_FILES['pic']['tmp_name']; // D:\Programe Files\Xampp\tmp\php696A.tmp
+            $file_name_as_array = explode(".",$tmp_file_nmae); // convert string to array ie file_name_as_array[0] = antonio-freeman and file_name_as_array[0] = jpg
+            // dd($file_name_as_array);
+            $ext = end($file_name_as_array);
+            $data['image_name'] = $ext;
+        }
 
 
         $data['first_name'] = $first_name;
@@ -64,15 +41,28 @@ if(isset($_POST['action'])) {
         $data['telephone'] = $telephone;
         $data['email'] = $email;
         $data['address'] = $address;
-        $data['image_name'] = $image_full_path;
-        $query = prepare_update_query("contacts",$data,$id);
+        $query = prepare_update_query("contacts",$data,"id = $id");
         // dd($query);
         db_query($query);
-        // $id = get_last_insert_id();
-        // $file_name = "$id.$ext";
-        move_uploaded_file($tmp_file_path,"images/users/$image_full_path");
+        if(isset($data['image_name'])) {
+            // DELETE THE OLD IMAGE
+            $old_image_name = get_image_name($old_image_name,$id);
+            unlink("images/users/$old_image_name");
+
+            $file_name = "$id.$ext";
+            move_uploaded_file($tmp_file_path,"images/users/$file_name");
+            header("Location: index.php?op=edit&status=success");
+        }
     }
 } 
+
+if(!isset($_GET['id']))
+{
+    dd('404! Page Not Found');
+}
+$id = $_GET['id'];
+$query = "SELECT * FROM contacts WHERE id = $id";
+$rows = db_select($query)[0];
 ?>
 <head>
     <!--Import Google Icon Font-->
@@ -120,80 +110,66 @@ if(isset($_POST['action'])) {
         if($error):
         ?>
         <div class="row">
-            <!-- <div class="materialert">
-                <i class="material-icons">check_circle</i> <span>Bienvenido, Linebeck</span>
-                <button type="button" class="close-alert">×</button>
-            </div> -->
-            <div class="materialert info">
-                <div class="material-icons">info_outline</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div>
-            <!-- <div class="materialert error">
+            <div class="materialert error">
                 <div class="material-icons">error_outline</div>
                 Oh! What a beautiful alert :)
                 <button type="button" class="close-alert">×</button>
             </div>
-            <div class="materialert success">
-                <div class="material-icons">check</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div>
-            <div class="materialert warning">
-                <div class="material-icons">warning</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div> -->
         </div>
         <?php
         endif;
         ?>
         <div class="row">
             <form class="col s12 formValidate" action="<?=$_SERVER['PHP_SELF']; ?>" id="add-contact-form" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="id" id="contact_id" value="<?= $rows[0]['id'];?>">
+            <input type="hidden" name="contact_id" value="<?= $rows['id'];?>">
                 <div class="row mb10">
                     <div class="input-field col s6">
-                        <input id="first_name" name="first_name" type="text" class="validate" data-error=".first_name_error" value="<?=$rows[0]['first_name'];?>">
+                        <input id="first_name" name="first_name" type="text" class="validate" data-error=".first_name_error" value="<?=old($_POST,'first_name',$rows['first_name']);?>">
                         <label for="first_name">First Name</label>
                         <div class="first_name_error "></div>
                     </div>
                     <div class="input-field col s6">
-                        <input id="last_name" name="last_name" type="text" class="validate" data-error=".last_name_error" value="<?=$rows[0]['last_name'];?>">
+                        <input id="last_name" name="last_name" type="text" class="validate" data-error=".last_name_error" value="<?=old($_POST,'last_name',$rows['last_name']);?>">
                         <label for="last_name">Last Name</label>
                         <div class="last_name_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s6">
-                        <input id="email" name="email" type="email" class="validate" data-error=".email_error" value="<?=$rows[0]['email'];?>">
+                        <input id="email" name="email" type="email" class="validate" data-error=".email_error" value="<?=old($_POST,'email',$rows['email'])?>">
                         <label for="email">Email</label>
                         <div class="email_error "></div>
                     </div>
                     <div class="input-field col s6">
-                        <input id="birthdate" name="birthdate" type="text" class="datepicker" data-error=".birthday_error" value="<?=$rows[0]['birthdate'];?>">
+                        <input id="birthdate" name="birthdate" type="text" class="datepicker" data-error=".birthday_error" value="<?=old($_POST,'birthdate',$rows['birthdate'])?>">
                         <label for="birthdate">Birthdate</label>
                         <div class="birthday_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s12">
-                        <input id="telephone" name="telephone" type="tel" class="validate" data-error=".telephone_error" value="<?=$rows[0]['telephone'];?>">
+                        <input id="telephone" name="telephone" type="tel" class="validate" data-error=".telephone_error" value="<?=old($_POST,'telephone',$rows['telephone']);?>">
                         <label for="telephone">Telephone</label>
                         <div class="telephone_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
                     <div class="input-field col s12">
-                        <textarea id="address" name="address" class="materialize-textarea" data-error=".address_error"><?=$rows[0]['address'];?></textarea>
+                        <textarea id="address" name="address" class="materialize-textarea" data-error=".address_error"><?=old($_POST,'address',$rows['address']);?></textarea>
                         <label for="address">Addess</label>
                         <div class="address_error "></div>
                     </div>
                 </div>
                 <div class="row mb10">
-                    <div class="file-field input-field col s12">
+                <div class="col s2">
+                        <img id="temp_pic" width="100%" class="circle" src="./images/users/<?= get_image_name($rows['image_name'],
+                        $id)?>" 
+                        alt="<?= $rows['first_name']." ". $rows['last_name'];?>" >
+                    </div>
+                    <div class="file-field input-field col s10">
                         <div class="btn">
                             <span>Image</span>
-                            <input type="file" name="pic" id="pic" data-error=".pic_error">
+                            <input type="file" name="pic" id="pic" data-error=".pic_error" >
                         </div>
                         <div class="file-path-wrapper">
                             <input class="file-path validate" type="text" placeholder="Upload Your Image">
@@ -222,7 +198,7 @@ if(isset($_POST['action'])) {
     <script src="vendors/jquery-validation/validation.min.js" type="text/javascript"></script>
     <script src="vendors/jquery-validation/additional-methods.min.js" type="text/javascript"></script>
     <!--Include Page Level Scripts-->
-    <script src="js/pages/add-contact.js"></script>
+    <script src="js/pages/edit-contact.js"></script>
     <!--Custom JS-->
     <script src="js/custom.js" type="text/javascript"></script>
 </body>

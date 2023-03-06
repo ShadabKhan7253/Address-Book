@@ -17,9 +17,9 @@ if(isset($_POST['action'])) {
         // we have validate values, which we can directly insert in database
 
         // $_FILES = array(1) { ["pic"]=> array(5) { ["name"]=> string(19) "antonio-freeman.jpg" ["type"]=> string(10) "image/jpeg" ["tmp_name"]=> string(39) "D:\Programe Files\Xampp\tmp\phpB4C1.tmp" ["error"]=> int(0) ["size"]=> int(5004) } }
-        $tmp_file_nmae = $_FILES['pic']['name']; // antonio-freeman.jpg
+        $tmp_file_name = $_FILES['pic']['name']; // antonio-freeman.jpg
         $tmp_file_path = $_FILES['pic']['tmp_name']; // D:\Programe Files\Xampp\tmp\php696A.tmp
-        $file_name_as_array = explode(".",$tmp_file_nmae); // convert string to array ie file_name_as_array[0] = antonio-freeman and file_name_as_array[0] = jpg
+        $file_name_as_array = explode(".",$tmp_file_name); // convert string to array i.e file_name_as_array[0] = antonio-freeman and file_name_as_array[1] = jpg
         // dd($file_name_as_array);
         $ext = end($file_name_as_array);
 
@@ -35,7 +35,12 @@ if(isset($_POST['action'])) {
         db_query($query);
         $id = get_last_insert_id();
         $file_name = "$id.$ext";
+        // This function checks to ensure that the file designated by from is a valid upload file 
+        // (meaning that it was uploaded via PHP's HTTP POST upload mechanism). If the file is valid, 
+        // it will be moved to the filename given by to.
         move_uploaded_file($tmp_file_path,"images/users/$file_name");
+
+        header('Location: index.php?op=add&status=success');
     }
 } 
 ?>
@@ -68,8 +73,8 @@ if(isset($_POST['action'])) {
                     <ul class="right hide-on-med-and-down">
 
                         <!-- Dropdown Trigger -->
-                        <li><a class="dropdown-trigger" href="#!" data-target="dropdown1"><i
-                                    class="material-icons right">more_vert</i></a></li>
+                        <li><a class="dropdown-trigger" href="#!" data-target="dropdown1">
+                            <i class="material-icons right">more_vert</i></a></li>
                     </ul>
                 </div>
             </nav>
@@ -85,30 +90,11 @@ if(isset($_POST['action'])) {
         if($error):
         ?>
         <div class="row">
-            <!-- <div class="materialert">
-                <i class="material-icons">check_circle</i> <span>Bienvenido, Linebeck</span>
-                <button type="button" class="close-alert">×</button>
-            </div> -->
-            <div class="materialert info">
-                <div class="material-icons">info_outline</div>
-                Oh! What a beautiful alert :)
+        <div class="materialert error">
+            <div class="material-icons">error_outline</div>
+                Error :)
                 <button type="button" class="close-alert">×</button>
             </div>
-            <!-- <div class="materialert error">
-                <div class="material-icons">error_outline</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div>
-            <div class="materialert success">
-                <div class="material-icons">check</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div>
-            <div class="materialert warning">
-                <div class="material-icons">warning</div>
-                Oh! What a beautiful alert :)
-                <button type="button" class="close-alert">×</button>
-            </div> -->
         </div>
         <?php
         endif;
@@ -166,8 +152,8 @@ if(isset($_POST['action'])) {
                     </div>
                 </div>
                 <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
-                        <i class="material-icons right">send</i>
-                    </button>
+                    <i class="material-icons right">send</i>
+                </button>
             </form>
         </div>
     </div>
