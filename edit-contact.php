@@ -162,7 +162,7 @@ $rows = db_select($query)[0];
                 </div>
                 <div class="row mb10">
                 <div class="col s2">
-                        <img id="temp_pic" width="100%" class="circle" src="./images/users/<?= get_image_name($rows['image_name'],
+                        <img id="temp_pic" width="150px" height="150px" class="circle" src="./images/users/<?= get_image_name($rows['image_name'],
                         $id)?>" 
                         alt="<?= $rows['first_name']." ". $rows['last_name'];?>" >
                     </div>

@@ -103,7 +103,7 @@ if($rows === false) {
                     foreach($rows as $row):
                     ?>
                     <tr>
-                        <td><img class="circle" src="images/users/<?= get_image_name($row['image_name'],$row['id']) ?>" alt="" height="60%"></td>
+                        <td><img class="circle" src="images/users/<?= get_image_name($row['image_name'],$row['id']) ?>" alt="" width="150px" height="150px"></td>
                         <td><?= $row['first_name']. " " . $row['last_name']; ?></td>
                         <td><?= $row['email']; ?></td>
                         <td><?= $row['birthdate']; ?></td>

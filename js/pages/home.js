@@ -2,13 +2,12 @@ $(function () {
   $('.modal').modal();
   $('.delete-contact').click(function () {
     var id = $(this).data('id');
-    $('#modal-agree').attr('href',`delete-contact.php?id=$id`)
+    $('#modal-agree').attr('href',`delete-contact.php?id=${id}`)
   }) 
 
   function getUrlQueryParams() {
     const queryParams = window.location.search.substring(1).split('&');
-    let vars = [],
-      hash;
+    let vars = [],hash;
     for (let i = 0; i < queryParams.length; i++) {
       hash = queryParams[i].split('=');
       vars[hash[0]] = hash[1];
@@ -29,5 +28,10 @@ $(function () {
       html: 'Contact Edit Successfully!',
       classes: 'green darken-1',
     });
-  }
+  } else if (operation === 'delete' && status === 'success') {
+    M.toast({
+      html: 'Contact Deleted Successfully!',
+      classes: 'green darken-1',
+    });
+  } 
 });
