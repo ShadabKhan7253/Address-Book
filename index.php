@@ -1,7 +1,7 @@
 <?php
 require_once('./includes/functions.inc.php');
 
-define('ROWS_PER_PAGE',6);
+define('ROWS_PER_PAGE',10);
 
 $rows = db_select("SELECT COUNT(*) AS total_count FROM `contacts`");
 if($rows === false) {
@@ -9,11 +9,11 @@ if($rows === false) {
 }
 
 $total_num_of_contacts = $rows[0]['total_count'];
-// dd($total_num_of_contacts);
+// dd($total_num_of_contacts); // string(2) "26"
 $num_of_pages = ceil($total_num_of_contacts / ROWS_PER_PAGE);
 
 $current_page = isset($_GET['page']) ? $_GET['page'] : 1;
-// dd($_GET['page']);
+// dd($_GET['page']); //string(1) "1"
 
 if($current_page < 1 || $current_page > $num_of_pages) {
     // die("404 NOT FOUND");
